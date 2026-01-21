@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distribución de Población por Edad</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    
+    #container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 5px;
+      font-size: 24px;
+    }
+    h2 {
+        text-align: center;
+        color: #666;
+        font-weight: normal; /* Make it lighter than h1 */
+        font-size: 16px;
+        margin-top: 0; /* Remove top margin so it's close to h1 */
+        margin-bottom: 16px;
+    }
+    
+    /* Button styles */
+    .button-container {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      margin: 0 5px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 2px solid #222831;
+      background-color: white;
+      color: steelblue;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    
+    button.active {
+      background-color: steelblue;
+      color: white;
+    }
+    
+    button:hover {
+      background-color: rgb(29, 55, 77);
+      color: white;
+    }
+    
+    /* Chart styles */
+    .bar {
+      fill: steelblue;
+      transition: fill 0.3s;
+    }
+    
+    .bar:hover {
+      fill: #222831;
+    }
+    
+    .axis text {
+      font-size: 12px;
+    }
+    
+    .axis-label {
+      font-size: 14px;
+      font-weight: bold;
+    }
+    
+    /* Caption styles */
+    .caption {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      margin-top: 10px;
+      font-style: italic;
+    }
+    
+    /* Tooltip styles */
+    #tooltip {
+      position: absolute;
+      opacity: 0;
+      background: white;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <h1>Población en Argentina: 2026 vs. 2040</h1>
+    <h2>Para 2040, habrá 3,5 millones de habitantes en edad escolar menos que hoy</h2>
+    <!-- Year selection buttons -->
+    <div class="button-container">
+      <button id="btn2026" class="active">2026</button>
+      <button id="btn2040">2040</button>
+    </div>
+    
+    <!-- SVG container for the chart -->
+    <svg id="chart"></svg>
+    
+    <!-- Tooltip (hidden by default) -->
+    <div id="tooltip"></div>
+    
+    <!-- Caption below the chart -->
+    <p class="caption">Fuente: INDEC. Visualización: Franco Guiragossian</p>
+  </div>
+
+  <script>
+    // Chart dimensions and margins
+    const margin = {top: 20, right: 30, bottom: 60, left: 60};
+    const width = 800 - margin.left - margin.right;
+    const height = 500 - margin.top - margin.bottom;
+    
+    // Variable to store the current year being displayed
+    let currentYear = "2026";
+    
+    // Select the SVG element and set its dimensions
+    const svg = d3.select("#chart")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g") // Create a group element for the chart
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+    // Load the CSV data from the URL
+    d3.csv("https://raw.githubusercontent.com/francossian/dataviz-d3/refs/heads/main/2026-01-19_demografia-edad-argentina/data/datos-poblacion-26-40.csv")
+      .then(function(data) {
+        
+        // Process the data: convert string numbers to actual numbers
+        data.forEach(d => {
+          d["2026"] = +d["2026"]; // Convert to number
+          d["2040"] = +d["2040"]; // Convert to number
+        });
+        
+        // Create the X scale (for age groups - categorical)
+        const x = d3.scaleBand()
+          .domain(data.map(d => d.GrupoEdad)) // All age groups
+          .range([0, width]) // Map to chart width
+          .padding(0.2); // Space between bars
+        
+        // Create the Y scale (for population values - numerical)
+        const y = d3.scaleLinear()
+          .domain([0, d3.max(data, d => Math.max(d["2026"], d["2040"])) / 1e6]) // Divide by 1 million
+          .range([height, 0]); // Inverted (SVG coordinates start from top)
+        
+        // Add X axis to the chart
+        svg.append("g")
+        .attr("class", "x-axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).tickSize(0)) // Remove tick marks by setting size to 0
+        .selectAll("text")
+        .style("text-anchor", "middle")
+        .style("font-size", "13px")
+        .attr("dy", "1em"); // Move text down (try 0.8em or 1.2em to adjust);
+        
+        // Add Y axis to the chart
+        svg.append("g")
+          .attr("class", "y-axis")
+          .call(d3.axisLeft(y))
+          .selectAll("text")
+          .style("font-size", "13px"); // Make Y axis values larger
+        
+        // Add horizontal gridlines (behind everything)
+        const grid = svg.append("g")
+        .attr("class", "grid")
+        .call(
+            d3.axisLeft(y)
+            .tickSize(-width)
+            .tickFormat("")
+        );
+
+        // style gridlines
+        grid.selectAll("line")
+        .style("stroke", "#e0e0e0");
+
+        // IMPORTANT: remove the grid's own axis line (domain), so it doesn't mess with axes
+        grid.select(".domain").remove();
+
+        // push grid behind axes + bars
+        grid.lower();
+        
+        // Add Y axis label
+        svg.append("text")
+          .attr("class", "axis-label")
+          .attr("transform", "rotate(-90)") // Rotate for vertical text
+          .attr("y", -45)
+          .attr("x", -height / 2)
+          .attr("text-anchor", "middle")
+          .style("font-size", "16px") // Make the label larger
+          .text("Población (millones)");
+        
+        // Add X axis label
+        svg.append("text")
+          .attr("class", "axis-label")
+          .attr("x", width / 2)
+          .attr("y", height + 50)
+          .attr("text-anchor", "middle")
+          .style("font-size", "16px")
+          .text("Edad (años)");
+        
+        // Function to update the chart when year changes
+        function updateChart(year) {
+          currentYear = year;
+          
+          // Update button states (active/inactive)
+          d3.select("#btn2026").classed("active", year === "2026");
+          d3.select("#btn2040").classed("active", year === "2040");
+          
+          // DATA JOIN: Bind data to bars
+          const bars = svg.selectAll(".bar")
+            .data(data, d => d.GrupoEdad); // Use age group as key
+          
+          // ENTER: Create new bars for new data
+          bars.enter()
+            .append("rect")
+            .attr("class", "bar")
+            .attr("x", d => x(d.GrupoEdad)) // Position based on age group
+            .attr("width", x.bandwidth()) // Width based on scale
+            .attr("y", height) // Start from bottom for animation
+            .attr("height", 0) // Start with height 0 for animation
+            // Add tooltip event listeners
+            .on("mouseover", function(event, d) {
+              // Calculate total population for the selected year
+              const total = d3.sum(data, item => item[currentYear]);
+              
+              // Calculate percentage
+              const percentage = (d[currentYear] / total * 100).toFixed(1);
+              
+              // Format number with thousand separator
+              const habitantes = d[currentYear].toLocaleString('es-AR');
+              
+              // Build tooltip HTML
+              const tooltipHTML = `
+                Edad: ${d.GrupoEdad} años<br/>
+                Habitantes: ${habitantes}<br/>
+                % de la población: ${percentage}%<br/>
+                Año: ${currentYear}
+              `;
+              
+              // Show and populate tooltip
+              d3.select("#tooltip")
+                .style("opacity", 1)
+                .html(tooltipHTML);
+            })
+            .on("mousemove", function(event) {
+              // Move tooltip with mouse
+              d3.select("#tooltip")
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 10) + "px");
+            })
+            .on("mouseout", function() {
+              // Hide tooltip
+              d3.select("#tooltip")
+                .style("opacity", 0);
+            })
+            .merge(bars) // Merge with existing bars
+            .transition() // Animate the changes
+            .duration(750) // Animation duration in milliseconds
+            .attr("y", d => y(d[year] / 1e6)) // New Y position (divide by 1 million)
+            .attr("height", d => height - y(d[year] / 1e6)); // New height
+          
+          // EXIT: Remove bars that are no longer needed
+          bars.exit()
+            .transition()
+            .duration(750)
+            .attr("y", height)
+            .attr("height", 0)
+            .remove();
+        }
+        
+        // Initial chart render with 2026 data
+        updateChart("2026");
+        
+        // Add click event listeners to buttons
+        d3.select("#btn2026").on("click", () => updateChart("2026"));
+        d3.select("#btn2040").on("click", () => updateChart("2040"));
+        
+      })
+      .catch(function(error) {
+        console.error("Error loading the CSV file:", error);
+      });
+  </script>
+</body>
+</html>
