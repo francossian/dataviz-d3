@@ -48,13 +48,13 @@ df_grupos_pct <- df %>%
   group_by(GrupoEdad) %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)), .groups = "drop") %>%
   mutate(across(where(is.numeric), ~ .x / sum(.x, na.rm = TRUE)))
-write.csv(df_grupos_pct, "datos-poblacion-pct.csv", row.names = FALSE)
+write.csv(df_grupos_pct, "data/datos-poblacion-pct.csv", row.names = FALSE)
 
 df_grupos_pob <- df %>%
   select(-Edad) %>%
   group_by(GrupoEdad) %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)), .groups = "drop")
-write.csv(df_grupos_pob, "datos-poblacion.csv", row.names = FALSE)
+write.csv(df_grupos_pob, "data/datos-poblacion.csv", row.names = FALSE)
 
 # Grupos OMS https://ccfprosario.com/etapas-de-la-vida-por-edades-segun-la-oms/#conoce_las_12_etapas_del_desarrollo_humano_y_su_importancia_en_la_vida
 
@@ -63,10 +63,17 @@ df_grupos_pct_2 <- df %>%
   group_by(EtapaVida) %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)), .groups = "drop") %>%
   mutate(across(where(is.numeric), ~ .x / sum(.x, na.rm = TRUE)))
-write.csv(df_grupos_pct_2, "datos-poblacion-etapas-pct.csv", row.names = FALSE)
+write.csv(df_grupos_pct_2, "data/datos-poblacion-etapas-pct.csv", row.names = FALSE)
 
 df_grupos_pob_2 <- df %>%
   select(-Edad) %>%
   group_by(EtapaVida) %>%
   summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)), .groups = "drop")
-write.csv(df_grupos_pob_2, "datos-poblacion-etapas.csv", row.names = FALSE)
+write.csv(df_grupos_pob_2, "data/datos-poblacion-etapas.csv", row.names = FALSE)
+
+
+df_grupos_pob_2_2640 <- df %>%
+  select(EtapaVida, "2026", "2040") %>%
+  group_by(EtapaVida) %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)), .groups = "drop")
+write.csv(df_grupos_pob_2, "data/datos-poblacion-etapas-26-40.csv", row.names = FALSE)
