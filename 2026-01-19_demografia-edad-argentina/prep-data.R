@@ -72,6 +72,13 @@ df_grupos_pob_2 <- df %>%
 write.csv(df_grupos_pob_2, "data/datos-poblacion-etapas.csv", row.names = FALSE)
 
 
+df_grupos_pob_2640 <- df %>%
+  select(GrupoEdad, "2026", "2040") %>%
+  group_by(GrupoEdad) %>%
+  summarise(across(where(is.numeric), ~ sum(.x, na.rm = TRUE)), .groups = "drop")
+write.csv(df_grupos_pob_2640, "data/datos-poblacion-26-40.csv", row.names = FALSE)
+
+
 df_grupos_pob_2_2640 <- df %>%
   select(EtapaVida, "2026", "2040") %>%
   group_by(EtapaVida) %>%
