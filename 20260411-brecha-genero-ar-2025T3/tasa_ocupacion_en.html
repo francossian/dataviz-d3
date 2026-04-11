@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,29 +11,27 @@
     <div class="container">
       <div class="header">
         <div class="title">
-          Los <span class="hl-hombres">hombres</span>
-          ganan más que las
-          <span class="hl-mujeres">mujeres</span>
+          The employment rate is higher for
+          <span class="hl-hombres">men</span> than for
+          <span class="hl-mujeres">women</span>
         </div>
         <div class="subtitle">
-          Ingreso mensual promedio, por nivel educativo y sexo
+          Share of employed adults, by education level and sex
         </div>
       </div>
       <div class="legend">
         <div class="legend-item">
           <div class="legend-swatch" style="background: #0b2d72"></div>
-          Hombres
+          Men
         </div>
         <div class="legend-item">
           <div class="legend-swatch" style="background: #0992c2"></div>
-          Mujeres
+          Women
         </div>
       </div>
       <div class="chart-area" id="chart"></div>
       <div class="caption">
-        Fuente: EPH, INDEC · 3° trim. 2025 · Promedios ponderados por grupo ·
-        Personas ocupadas adultas en su ocupación principal<br />Valores en
-        pesos ajustados a enero de 2026 (índice de salarios). Elaborado por
+        Source: EPH, INDEC · Q3 2025 · Adults 18 and older<br />Prepared by
         <strong>Franco Guiragossian</strong> · <strong>dataviz.ar</strong>
       </div>
     </div>
@@ -41,10 +39,6 @@
     <script>
       const data = datos;
       const colors = { Hombres: "#0B2D72", Mujeres: "#0992C2" };
-
-      function formatMiles(v) {
-        return "$" + Math.round(v / 1000).toLocaleString("es-AR");
-      }
 
       const chartDiv = document.getElementById("chart");
       const width = 952;
@@ -85,12 +79,10 @@
         .range([0, x0.bandwidth()])
         .padding(0.12);
 
-      const yMax = 2000000;
-      const y = d3.scaleLinear().domain([0, yMax]).range([innerH, 0]);
-
-      const yTicks = [500000, 1000000, 1500000, 2000000];
+      const y = d3.scaleLinear().domain([0, 1]).range([innerH, 0]);
 
       // Grid lines
+      const yTicks = [0.2, 0.4, 0.6, 0.8, 1.0];
       yTicks.forEach((t) => {
         g.append("line")
           .attr("class", "grid-line")
@@ -108,7 +100,7 @@
           .attr("y", y(t))
           .attr("dy", "0.35em")
           .attr("text-anchor", "end")
-          .text(formatMiles(t));
+          .text(d3.format(".0%")(t));
       });
 
       // Y axis title
@@ -118,7 +110,7 @@
         .attr("x", -innerH / 2)
         .attr("y", -margin.left + 16)
         .attr("text-anchor", "middle")
-        .text("Ingreso mensual (miles de pesos)");
+        .text("Employment rate (%)");
 
       // Bars
       const groups = g
@@ -133,7 +125,7 @@
         .data((d) =>
           sexos.map((s) => {
             const item = data.find((r) => r.educacion === d && r.sexo === s);
-            return { sexo: s, value: item.ingreso_mensual, educacion: d };
+            return { sexo: s, value: item.tasa_ocupacion, educacion: d };
           }),
         )
         .join("path")
@@ -162,7 +154,7 @@
         .data((d) =>
           sexos.map((s) => {
             const item = data.find((r) => r.educacion === d && r.sexo === s);
-            return { sexo: s, value: item.ingreso_mensual };
+            return { sexo: s, value: item.tasa_ocupacion };
           }),
         )
         .join("text")
@@ -170,17 +162,14 @@
         .attr("x", (d) => x1(d.sexo) + x1.bandwidth() / 2)
         .attr("y", (d) => y(d.value) - 8)
         .attr("text-anchor", "middle")
-        .text((d) => formatMiles(d.value));
+        .text((d) => d3.format(".0%")(d.value));
 
       // X axis labels (multiline)
       const labelMap = {
-        "Primario incompleto": ["Primario", "incompleto"],
-        "Secundario incompleto": ["Secundario", "incompleto"],
-        "Secundario completo": ["Secundario", "completo"],
-        "Universitario en curso/completo": [
-          "Universitario",
-          "en curso/completo",
-        ],
+        "Primario incompleto": ["Primary", "incomplete"],
+        "Secundario incompleto": ["Secondary", "incomplete"],
+        "Secundario completo": ["Secondary", "complete"],
+        "Universitario en curso/completo": ["University", "in progress"],
       };
 
       educacion.forEach((ed) => {
@@ -190,7 +179,7 @@
           g.append("text")
             .attr("class", "axis-label")
             .attr("x", xPos)
-            .attr("y", innerH + 24 + i * 22)
+            .attr("y", innerH + 24 + i * 18)
             .attr("text-anchor", "middle")
             .text(line);
         });

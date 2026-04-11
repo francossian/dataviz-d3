@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,40 +11,24 @@
     <div class="container">
       <div class="header">
         <div class="title">
-          Los <span class="hl-hombres">hombres</span>
-          ganan más que las
-          <span class="hl-mujeres">mujeres</span>
+          Women earn <span class="hl-brecha">X%</span> less than men
         </div>
         <div class="subtitle">
-          Ingreso mensual promedio, por nivel educativo y sexo
-        </div>
-      </div>
-      <div class="legend">
-        <div class="legend-item">
-          <div class="legend-swatch" style="background: #0b2d72"></div>
-          Hombres
-        </div>
-        <div class="legend-item">
-          <div class="legend-swatch" style="background: #0992c2"></div>
-          Mujeres
+          Gender pay gap in hourly income, by education level
         </div>
       </div>
       <div class="chart-area" id="chart"></div>
       <div class="caption">
-        Fuente: EPH, INDEC · 3° trim. 2025 · Promedios ponderados por grupo ·
-        Personas ocupadas adultas en su ocupación principal<br />Valores en
-        pesos ajustados a enero de 2026 (índice de salarios). Elaborado por
+        Gender pay gap: Difference between men's and women's hourly income, as a
+        share of men's income. Paid hours in main job only.<br />
+        Source: EPH, INDEC · Q3 2025 · Occupied adults · Prepared by
         <strong>Franco Guiragossian</strong> · <strong>dataviz.ar</strong>
       </div>
     </div>
 
     <script>
       const data = datos;
-      const colors = { Hombres: "#0B2D72", Mujeres: "#0992C2" };
-
-      function formatMiles(v) {
-        return "$" + Math.round(v / 1000).toLocaleString("es-AR");
-      }
+      const color = "#e63946";
 
       const chartDiv = document.getElementById("chart");
       const width = 952;
@@ -70,25 +54,25 @@
         "Secundario completo",
         "Universitario en curso/completo",
       ];
-      const sexos = ["Hombres", "Mujeres"];
 
-      const x0 = d3
+      // One value per educacion (brecha is the same for both sexos)
+      const chartData = educacion.map((ed) => ({
+        educacion: ed,
+        value: data.find((r) => r.educacion === ed).brecha,
+      }));
+
+      const x = d3
         .scaleBand()
         .domain(educacion)
         .range([0, innerW])
         .paddingInner(0.3)
         .paddingOuter(0.15);
 
-      const x1 = d3
-        .scaleBand()
-        .domain(sexos)
-        .range([0, x0.bandwidth()])
-        .padding(0.12);
+      const barWidth = x.bandwidth() * 0.5;
 
-      const yMax = 2000000;
-      const y = d3.scaleLinear().domain([0, yMax]).range([innerH, 0]);
+      const y = d3.scaleLinear().domain([0, 0.3]).range([innerH, 0]);
 
-      const yTicks = [500000, 1000000, 1500000, 2000000];
+      const yTicks = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3];
 
       // Grid lines
       yTicks.forEach((t) => {
@@ -108,7 +92,7 @@
           .attr("y", y(t))
           .attr("dy", "0.35em")
           .attr("text-anchor", "end")
-          .text(formatMiles(t));
+          .text(d3.format(".0%")(t));
       });
 
       // Y axis title
@@ -118,34 +102,28 @@
         .attr("x", -innerH / 2)
         .attr("y", -margin.left + 16)
         .attr("text-anchor", "middle")
-        .text("Ingreso mensual (miles de pesos)");
+        .text("Gender pay gap (%)");
 
       // Bars
       const groups = g
         .selectAll(".group")
-        .data(educacion)
+        .data(chartData)
         .join("g")
         .attr("class", "group")
-        .attr("transform", (d) => `translate(${x0(d)},0)`);
+        .attr("transform", (d) => `translate(${x(d.educacion)},0)`);
 
       groups
         .selectAll("path.bar")
-        .data((d) =>
-          sexos.map((s) => {
-            const item = data.find((r) => r.educacion === d && r.sexo === s);
-            return { sexo: s, value: item.ingreso_mensual, educacion: d };
-          }),
-        )
+        .data((d) => [d])
         .join("path")
         .attr("class", "bar")
-        .attr("fill", (d) => colors[d.sexo])
+        .attr("fill", color)
         .attr("d", (d) => {
-          const x = x1(d.sexo);
-          const w = x1.bandwidth();
+          const bx = (x.bandwidth() - barWidth) / 2;
           const top = y(d.value);
           const bottom = innerH;
           const r = 6;
-          return `M${x + r},${top} L${x + w - r},${top} Q${x + w},${top} ${x + w},${top + r} L${x + w},${bottom} L${x},${bottom} L${x},${top + r} Q${x},${top} ${x + r},${top} Z`;
+          return `M${bx + r},${top} L${bx + barWidth - r},${top} Q${bx + barWidth},${top} ${bx + barWidth},${top + r} L${bx + barWidth},${bottom} L${bx},${bottom} L${bx},${top + r} Q${bx},${top} ${bx + r},${top} Z`;
         });
 
       // Baseline (drawn after bars so it sits on top)
@@ -159,33 +137,25 @@
       // Bar labels
       groups
         .selectAll(".bar-label")
-        .data((d) =>
-          sexos.map((s) => {
-            const item = data.find((r) => r.educacion === d && r.sexo === s);
-            return { sexo: s, value: item.ingreso_mensual };
-          }),
-        )
+        .data((d) => [d])
         .join("text")
         .attr("class", "bar-label")
-        .attr("x", (d) => x1(d.sexo) + x1.bandwidth() / 2)
+        .attr("x", x.bandwidth() / 2)
         .attr("y", (d) => y(d.value) - 8)
         .attr("text-anchor", "middle")
-        .text((d) => formatMiles(d.value));
+        .text((d) => d3.format(".0%")(d.value));
 
       // X axis labels (multiline)
       const labelMap = {
-        "Primario incompleto": ["Primario", "incompleto"],
-        "Secundario incompleto": ["Secundario", "incompleto"],
-        "Secundario completo": ["Secundario", "completo"],
-        "Universitario en curso/completo": [
-          "Universitario",
-          "en curso/completo",
-        ],
+        "Primario incompleto": ["Primary", "incomplete"],
+        "Secundario incompleto": ["Secondary", "incomplete"],
+        "Secundario completo": ["Secondary", "complete"],
+        "Universitario en curso/completo": ["University", "in progress"],
       };
 
       educacion.forEach((ed) => {
         const lines = labelMap[ed];
-        const xPos = x0(ed) + x0.bandwidth() / 2;
+        const xPos = x(ed) + x.bandwidth() / 2;
         lines.forEach((line, i) => {
           g.append("text")
             .attr("class", "axis-label")

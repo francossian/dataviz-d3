@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="chart-styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+    <script src="datos_brecha_3T25.js"></script>
   </head>
   <body>
     <div class="container">
@@ -33,54 +34,12 @@
         Fuente: EPH, INDEC · 3° trim. 2025 · Promedios ponderados por grupo ·
         Personas ocupadas adultas en su ocupación principal<br />Valores en
         pesos ajustados a enero de 2026 (índice de salarios). Elaborado por
-        Franco Guiragossian · dataviz.ar
+        <strong>Franco Guiragossian</strong> · <strong>dataviz.ar</strong>
       </div>
     </div>
 
     <script>
-      const data = [
-        {
-          sexo: "Hombres",
-          educacion: "Primario incompleto",
-          ingreso_por_hora: 5718.9328,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Primario incompleto",
-          ingreso_por_hora: 4217.1726,
-        },
-        {
-          sexo: "Hombres",
-          educacion: "Secundario incompleto",
-          ingreso_por_hora: 5467.0937,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Secundario incompleto",
-          ingreso_por_hora: 4270.7504,
-        },
-        {
-          sexo: "Hombres",
-          educacion: "Secundario completo",
-          ingreso_por_hora: 6556.6923,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Secundario completo",
-          ingreso_por_hora: 5508.6917,
-        },
-        {
-          sexo: "Hombres",
-          educacion: "Universitario en curso/completo",
-          ingreso_por_hora: 10722.4367,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Universitario en curso/completo",
-          ingreso_por_hora: 9246.8413,
-        },
-      ];
-
+      const data = datos;
       const colors = { Hombres: "#0B2D72", Mujeres: "#0992C2" };
 
       function formatPesos(v) {

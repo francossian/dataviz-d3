@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,29 +11,28 @@
     <div class="container">
       <div class="header">
         <div class="title">
-          Los <span class="hl-hombres">hombres</span>
-          ganan más que las
-          <span class="hl-mujeres">mujeres</span>
+          <span class="hl-hombres">Men</span>
+          earn more than
+          <span class="hl-mujeres">women</span>
         </div>
         <div class="subtitle">
-          Ingreso mensual promedio, por nivel educativo y sexo
+          Average monthly income, by education level and sex
         </div>
       </div>
       <div class="legend">
         <div class="legend-item">
           <div class="legend-swatch" style="background: #0b2d72"></div>
-          Hombres
+          Men
         </div>
         <div class="legend-item">
           <div class="legend-swatch" style="background: #0992c2"></div>
-          Mujeres
+          Women
         </div>
       </div>
       <div class="chart-area" id="chart"></div>
       <div class="caption">
-        Fuente: EPH, INDEC · 3° trim. 2025 · Promedios ponderados por grupo ·
-        Personas ocupadas adultas en su ocupación principal<br />Valores en
-        pesos ajustados a enero de 2026 (índice de salarios). Elaborado por
+        Source: EPH, INDEC · Q3 2025 · Occupied adults, main job<br />Values in
+        pesos adjusted to Jan 2026 (wage index). Prepared by
         <strong>Franco Guiragossian</strong> · <strong>dataviz.ar</strong>
       </div>
     </div>
@@ -118,7 +117,7 @@
         .attr("x", -innerH / 2)
         .attr("y", -margin.left + 16)
         .attr("text-anchor", "middle")
-        .text("Ingreso mensual (miles de pesos)");
+        .text("Monthly income (thous. ARS)");
 
       // Bars
       const groups = g
@@ -174,13 +173,10 @@
 
       // X axis labels (multiline)
       const labelMap = {
-        "Primario incompleto": ["Primario", "incompleto"],
-        "Secundario incompleto": ["Secundario", "incompleto"],
-        "Secundario completo": ["Secundario", "completo"],
-        "Universitario en curso/completo": [
-          "Universitario",
-          "en curso/completo",
-        ],
+        "Primario incompleto": ["Primary", "incomplete"],
+        "Secundario incompleto": ["Secondary", "incomplete"],
+        "Secundario completo": ["Secondary", "complete"],
+        "Universitario en curso/completo": ["University", "in progress"],
       };
 
       educacion.forEach((ed) => {

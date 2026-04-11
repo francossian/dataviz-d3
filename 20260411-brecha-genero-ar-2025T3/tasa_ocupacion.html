@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="chart-styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+    <script src="datos_brecha_3T25.js"></script>
   </head>
   <body>
     <div class="container">
@@ -31,55 +32,13 @@
       <div class="chart-area" id="chart"></div>
       <div class="caption">
         Fuente: EPH, INDEC · 3° trim. 2025 · Promedios ponderados por grupo ·
-        Población de 18 años y más<br />Elaborado por Franco Guiragossian ·
-        dataviz.ar
+        Población de 18 años y más<br />Elaborado por <strong>Franco Guiragossian</strong> ·
+        <strong>dataviz.ar</strong>
       </div>
     </div>
 
     <script>
-      const data = [
-        {
-          sexo: "Hombres",
-          educacion: "Primario incompleto",
-          tasa_ocupacion: 0.4086,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Primario incompleto",
-          tasa_ocupacion: 0.232,
-        },
-        {
-          sexo: "Hombres",
-          educacion: "Secundario incompleto",
-          tasa_ocupacion: 0.6776,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Secundario incompleto",
-          tasa_ocupacion: 0.3932,
-        },
-        {
-          sexo: "Hombres",
-          educacion: "Secundario completo",
-          tasa_ocupacion: 0.8057,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Secundario completo",
-          tasa_ocupacion: 0.5531,
-        },
-        {
-          sexo: "Hombres",
-          educacion: "Universitario en curso/completo",
-          tasa_ocupacion: 0.7439,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Universitario en curso/completo",
-          tasa_ocupacion: 0.6322,
-        },
-      ];
-
+      const data = datos;
       const colors = { Hombres: "#0B2D72", Mujeres: "#0992C2" };
 
       const chartDiv = document.getElementById("chart");

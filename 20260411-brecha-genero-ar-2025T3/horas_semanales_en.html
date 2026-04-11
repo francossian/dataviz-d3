@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,40 +11,39 @@
     <div class="container">
       <div class="header">
         <div class="title">
-          Los <span class="hl-hombres">hombres</span>
-          ganan más que las
-          <span class="hl-mujeres">mujeres</span>
+          <span class="hl-hombres">Men</span> work more paid
+          hours<sup>1</sup> than
+          <span class="hl-mujeres">women</span>
         </div>
         <div class="subtitle">
-          Ingreso mensual promedio, por nivel educativo y sexo
+          Paid hours worked per week, by education level and sex
         </div>
       </div>
       <div class="legend">
         <div class="legend-item">
           <div class="legend-swatch" style="background: #0b2d72"></div>
-          Hombres
+          Men
         </div>
         <div class="legend-item">
           <div class="legend-swatch" style="background: #0992c2"></div>
-          Mujeres
+          Women
         </div>
       </div>
       <div class="chart-area" id="chart"></div>
+      <div class="footnote">
+        <sup>1</sup>Women work more unpaid hours than men (household tasks,
+        caregiving, etc.) but this chart only considers paid hours in the main
+        job.
+      </div>
       <div class="caption">
-        Fuente: EPH, INDEC · 3° trim. 2025 · Promedios ponderados por grupo ·
-        Personas ocupadas adultas en su ocupación principal<br />Valores en
-        pesos ajustados a enero de 2026 (índice de salarios). Elaborado por
-        <strong>Franco Guiragossian</strong> · <strong>dataviz.ar</strong>
+        Source: EPH, INDEC · Q3 2025 · Occupied adults, main job<br />Prepared
+        by <strong>Franco Guiragossian</strong> · <strong>dataviz.ar</strong>
       </div>
     </div>
 
     <script>
       const data = datos;
       const colors = { Hombres: "#0B2D72", Mujeres: "#0992C2" };
-
-      function formatMiles(v) {
-        return "$" + Math.round(v / 1000).toLocaleString("es-AR");
-      }
 
       const chartDiv = document.getElementById("chart");
       const width = 952;
@@ -85,10 +84,10 @@
         .range([0, x0.bandwidth()])
         .padding(0.12);
 
-      const yMax = 2000000;
+      const yMax = 50;
       const y = d3.scaleLinear().domain([0, yMax]).range([innerH, 0]);
 
-      const yTicks = [500000, 1000000, 1500000, 2000000];
+      const yTicks = [10, 20, 30, 40, 50];
 
       // Grid lines
       yTicks.forEach((t) => {
@@ -108,7 +107,7 @@
           .attr("y", y(t))
           .attr("dy", "0.35em")
           .attr("text-anchor", "end")
-          .text(formatMiles(t));
+          .text(t);
       });
 
       // Y axis title
@@ -118,7 +117,7 @@
         .attr("x", -innerH / 2)
         .attr("y", -margin.left + 16)
         .attr("text-anchor", "middle")
-        .text("Ingreso mensual (miles de pesos)");
+        .text("Paid hours per week");
 
       // Bars
       const groups = g
@@ -133,7 +132,7 @@
         .data((d) =>
           sexos.map((s) => {
             const item = data.find((r) => r.educacion === d && r.sexo === s);
-            return { sexo: s, value: item.ingreso_mensual, educacion: d };
+            return { sexo: s, value: item.horas_semanales, educacion: d };
           }),
         )
         .join("path")
@@ -162,7 +161,7 @@
         .data((d) =>
           sexos.map((s) => {
             const item = data.find((r) => r.educacion === d && r.sexo === s);
-            return { sexo: s, value: item.ingreso_mensual };
+            return { sexo: s, value: item.horas_semanales };
           }),
         )
         .join("text")
@@ -170,17 +169,14 @@
         .attr("x", (d) => x1(d.sexo) + x1.bandwidth() / 2)
         .attr("y", (d) => y(d.value) - 8)
         .attr("text-anchor", "middle")
-        .text((d) => formatMiles(d.value));
+        .text((d) => Math.round(d.value));
 
       // X axis labels (multiline)
       const labelMap = {
-        "Primario incompleto": ["Primario", "incompleto"],
-        "Secundario incompleto": ["Secundario", "incompleto"],
-        "Secundario completo": ["Secundario", "completo"],
-        "Universitario en curso/completo": [
-          "Universitario",
-          "en curso/completo",
-        ],
+        "Primario incompleto": ["Primary", "incomplete"],
+        "Secundario incompleto": ["Secondary", "incomplete"],
+        "Secundario completo": ["Secondary", "complete"],
+        "Universitario en curso/completo": ["University", "in progress"],
       };
 
       educacion.forEach((ed) => {

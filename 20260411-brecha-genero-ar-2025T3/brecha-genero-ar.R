@@ -29,6 +29,7 @@ df = df %>% select(
   PONDIIO      # Ponderador de ingresos
 )
 df = df %>% filter(CH06 >= 18) # Solo mayores de edad
+df$PP3E_TOT[df$PP3E_TOT >= 112] = NA # Horas razonables
 
 # Agrupamos educación para tener menos categorías, y grupos con más datos
 df = df %>% mutate(
@@ -151,3 +152,11 @@ datos_full = datos_full %>%
   arrange(educacion, region, grupo_edad, sexo)
 
 write_json(datos_full, paste0("datos_brecha_full_", periodo, ".json"))
+
+
+
+
+
+
+
+table(df$PP3E_TOT)

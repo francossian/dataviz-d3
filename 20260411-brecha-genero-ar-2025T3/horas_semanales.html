@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="chart-styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+    <script src="datos_brecha_3T25.js"></script>
   </head>
   <body>
     <div class="container">
       <div class="header">
         <div class="title">
-          Los <span class="hl-hombres">hombres</span>
-          también trabajan más horas que las
+          Los <span class="hl-hombres">hombres</span> trabajan más horas
+          remuneradas<sup>1</sup> que las
           <span class="hl-mujeres">mujeres</span>
         </div>
         <div class="subtitle">
-          Cantidad de horas trabajadas por semana, por nivel educativo y sexo
+          Cantidad de horas remuneradas por semana, por nivel educativo y sexo
         </div>
       </div>
       <div class="legend">
@@ -29,57 +30,21 @@
         </div>
       </div>
       <div class="chart-area" id="chart"></div>
+      <div class="footnote">
+        <sup>1</sup>Las mujeres trabajan más horas no remuneradas que los
+        hombres (tareas domésticas, cuidado de personas, etc.) pero esta
+        visualización solo considera las horas remuneradas en la ocupación
+        principal.
+      </div>
       <div class="caption">
         Fuente: EPH, INDEC · 3° trim. 2025 · Promedios ponderados por grupo ·
         Personas ocupadas adultas en su ocupación principal<br />Elaborado por
-        Franco Guiragossian · dataviz.ar
+        <strong>Franco Guiragossian</strong> · <strong>dataviz.ar</strong>
       </div>
     </div>
 
     <script>
-      const data = [
-        {
-          sexo: "Hombres",
-          educacion: "Primario incompleto",
-          horas_semanales: 42.0089,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Primario incompleto",
-          horas_semanales: 41.3257,
-        },
-        {
-          sexo: "Hombres",
-          educacion: "Secundario incompleto",
-          horas_semanales: 44.62,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Secundario incompleto",
-          horas_semanales: 30.7533,
-        },
-        {
-          sexo: "Hombres",
-          educacion: "Secundario completo",
-          horas_semanales: 43.9366,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Secundario completo",
-          horas_semanales: 36.5857,
-        },
-        {
-          sexo: "Hombres",
-          educacion: "Universitario en curso/completo",
-          horas_semanales: 39.2018,
-        },
-        {
-          sexo: "Mujeres",
-          educacion: "Universitario en curso/completo",
-          horas_semanales: 32.192,
-        },
-      ];
-
+      const data = datos;
       const colors = { Hombres: "#0B2D72", Mujeres: "#0992C2" };
 
       const chartDiv = document.getElementById("chart");
