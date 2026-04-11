@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="chart-styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="title">
+          La tasa de ocupación es mayor en
+          <span class="hl-hombres">hombres</span> que en
+          <span class="hl-mujeres">mujeres</span>
+        </div>
+        <div class="subtitle">
+          Porcentaje de personas adultas ocupadas, por nivel educativo y sexo
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-swatch" style="background: #0b2d72"></div>
+          Hombres
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background: #0992c2"></div>
+          Mujeres
+        </div>
+      </div>
+      <div class="chart-area" id="chart"></div>
+      <div class="caption">
+        Fuente: EPH, INDEC · 3° trim. 2025 · Promedios ponderados por grupo ·
+        Población de 18 años y más<br />Elaborado por Franco Guiragossian ·
+        dataviz.ar
+      </div>
+    </div>
+
+    <script>
+      const data = [
+        {
+          sexo: "Hombres",
+          educacion: "Primario incompleto",
+          tasa_ocupacion: 0.4086,
+        },
+        {
+          sexo: "Mujeres",
+          educacion: "Primario incompleto",
+          tasa_ocupacion: 0.232,
+        },
+        {
+          sexo: "Hombres",
+          educacion: "Secundario incompleto",
+          tasa_ocupacion: 0.6776,
+        },
+        {
+          sexo: "Mujeres",
+          educacion: "Secundario incompleto",
+          tasa_ocupacion: 0.3932,
+        },
+        {
+          sexo: "Hombres",
+          educacion: "Secundario completo",
+          tasa_ocupacion: 0.8057,
+        },
+        {
+          sexo: "Mujeres",
+          educacion: "Secundario completo",
+          tasa_ocupacion: 0.5531,
+        },
+        {
+          sexo: "Hombres",
+          educacion: "Universitario en curso/completo",
+          tasa_ocupacion: 0.7439,
+        },
+        {
+          sexo: "Mujeres",
+          educacion: "Universitario en curso/completo",
+          tasa_ocupacion: 0.6322,
+        },
+      ];
+
+      const colors = { Hombres: "#0B2D72", Mujeres: "#0992C2" };
+
+      const chartDiv = document.getElementById("chart");
+      const width = 952;
+      const height = chartDiv.clientHeight || 680;
+
+      const margin = { top: 16, right: 20, bottom: 72, left: 108 };
+      const innerW = width - margin.left - margin.right;
+      const innerH = height - margin.top - margin.bottom;
+
+      const svg = d3
+        .select("#chart")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+      const g = svg
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const educacion = [
+        "Primario incompleto",
+        "Secundario incompleto",
+        "Secundario completo",
+        "Universitario en curso/completo",
+      ];
+      const sexos = ["Hombres", "Mujeres"];
+
+      const x0 = d3
+        .scaleBand()
+        .domain(educacion)
+        .range([0, innerW])
+        .paddingInner(0.3)
+        .paddingOuter(0.15);
+
+      const x1 = d3
+        .scaleBand()
+        .domain(sexos)
+        .range([0, x0.bandwidth()])
+        .padding(0.12);
+
+      const y = d3.scaleLinear().domain([0, 1]).range([innerH, 0]);
+
+      // Grid lines
+      const yTicks = [0.2, 0.4, 0.6, 0.8, 1.0];
+      yTicks.forEach((t) => {
+        g.append("line")
+          .attr("class", "grid-line")
+          .attr("x1", 0)
+          .attr("x2", innerW)
+          .attr("y1", y(t))
+          .attr("y2", y(t));
+      });
+
+      // Y axis labels
+      yTicks.forEach((t) => {
+        g.append("text")
+          .attr("class", "axis-label")
+          .attr("x", -8)
+          .attr("y", y(t))
+          .attr("dy", "0.35em")
+          .attr("text-anchor", "end")
+          .text(d3.format(".0%")(t));
+      });
+
+      // Y axis title
+      g.append("text")
+        .attr("class", "axis-label")
+        .attr("transform", `rotate(-90)`)
+        .attr("x", -innerH / 2)
+        .attr("y", -margin.left + 16)
+        .attr("text-anchor", "middle")
+        .text("Tasa de ocupación (%)");
+
+      // Bars
+      const groups = g
+        .selectAll(".group")
+        .data(educacion)
+        .join("g")
+        .attr("class", "group")
+        .attr("transform", (d) => `translate(${x0(d)},0)`);
+
+      groups
+        .selectAll("path.bar")
+        .data((d) =>
+          sexos.map((s) => {
+            const item = data.find((r) => r.educacion === d && r.sexo === s);
+            return { sexo: s, value: item.tasa_ocupacion, educacion: d };
+          }),
+        )
+        .join("path")
+        .attr("class", "bar")
+        .attr("fill", (d) => colors[d.sexo])
+        .attr("d", (d) => {
+          const x = x1(d.sexo);
+          const w = x1.bandwidth();
+          const top = y(d.value);
+          const bottom = innerH;
+          const r = 6;
+          return `M${x + r},${top} L${x + w - r},${top} Q${x + w},${top} ${x + w},${top + r} L${x + w},${bottom} L${x},${bottom} L${x},${top + r} Q${x},${top} ${x + r},${top} Z`;
+        });
+
+      // Baseline (drawn after bars so it sits on top)
+      g.append("line")
+        .attr("class", "baseline")
+        .attr("x1", 0)
+        .attr("x2", innerW)
+        .attr("y1", y(0))
+        .attr("y2", y(0));
+
+      // Bar labels
+      groups
+        .selectAll(".bar-label")
+        .data((d) =>
+          sexos.map((s) => {
+            const item = data.find((r) => r.educacion === d && r.sexo === s);
+            return { sexo: s, value: item.tasa_ocupacion };
+          }),
+        )
+        .join("text")
+        .attr("class", "bar-label")
+        .attr("x", (d) => x1(d.sexo) + x1.bandwidth() / 2)
+        .attr("y", (d) => y(d.value) - 8)
+        .attr("text-anchor", "middle")
+        .text((d) => d3.format(".0%")(d.value));
+
+      // X axis labels (multiline)
+      const labelMap = {
+        "Primario incompleto": ["Primario", "incompleto"],
+        "Secundario incompleto": ["Secundario", "incompleto"],
+        "Secundario completo": ["Secundario", "completo"],
+        "Universitario en curso/completo": [
+          "Universitario",
+          "en curso/completo",
+        ],
+      };
+
+      educacion.forEach((ed) => {
+        const lines = labelMap[ed];
+        const xPos = x0(ed) + x0.bandwidth() / 2;
+        lines.forEach((line, i) => {
+          g.append("text")
+            .attr("class", "axis-label")
+            .attr("x", xPos)
+            .attr("y", innerH + 24 + i * 18)
+            .attr("text-anchor", "middle")
+            .text(line);
+        });
+      });
+    </script>
+  </body>
+</html>

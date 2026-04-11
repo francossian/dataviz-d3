@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #F0EDE6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  width: 1080px;
+  height: 1080px;
+  background: #F0EDE6;
+  font-family: 'DM Sans', sans-serif;
+  color: #2B2B2B;
+  display: flex;
+  flex-direction: column;
+  padding: 64px 64px 48px 64px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #2B2B2B;
+  margin-bottom: 8px;
+}
+
+.hl-hombres {
+  color: #0B2D72;
+}
+
+.hl-mujeres {
+  color: #0992C2;
+}
+
+.subtitle {
+  font-size: 28px;
+  font-weight: 300;
+  color: #5A5A5A;
+  line-height: 1.4;
+}
+
+.legend {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #2B2B2B;
+}
+
+.legend-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+.chart-area {
+  flex: 1;
+  position: relative;
+}
+
+.caption {
+  font-size: 16px;
+  font-weight: 300;
+  color: #8A8A8A;
+  line-height: 1.4;
+  margin-top: 16px;
+  border-top: 1px solid #D0CCC4;
+  padding-top: 12px;
+}
+
+/* SVG typography */
+.bar-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  fill: #2B2B2B;
+}
+
+.axis-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  fill: #5A5A5A;
+}
+
+.grid-line {
+  stroke: #D0CCC4;
+  stroke-dasharray: 3,4;
+  stroke-width: 0.8;
+}
+
+.baseline {
+  stroke: #2B2B2B;
+  stroke-width: 1.5;
+}
