@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="chart-styles.css" />
+    <style>
+      .title {
+        font-size: 36px;
+      }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
     <script src="datos_brecha_3T25.js"></script>
   </head>
@@ -16,7 +21,7 @@
           <span class="hl-mujeres">women</span>
         </div>
         <div class="subtitle">
-          Hourly income, by education level and sex
+          Average hourly income, by education level and sex
         </div>
       </div>
       <div class="legend">
@@ -32,7 +37,7 @@
       <div class="chart-area" id="chart"></div>
       <div class="caption">
         Source: EPH, INDEC · Q3 2025 · Occupied adults, main job<br />Values in
-        pesos adjusted to Jan 2026 (wage index). Prepared by
+        USD adjusted to Jan 2026 (wage index). Prepared by
         <strong>Franco Guiragossian</strong> · <strong>dataviz.ar</strong>
       </div>
     </div>
@@ -41,8 +46,12 @@
       const data = datos;
       const colors = { Hombres: "#0B2D72", Mujeres: "#0992C2" };
 
-      function formatPesos(v) {
-        return "$" + Math.round(v).toLocaleString("es-AR");
+      function formatUSD(v) {
+        return "$" + Math.round(v);
+      }
+
+      function formatUSDLabel(v) {
+        return "$" + v.toFixed(1);
       }
 
       const chartDiv = document.getElementById("chart");
@@ -84,10 +93,10 @@
         .range([0, x0.bandwidth()])
         .padding(0.12);
 
-      const yMax = 12000;
+      const yMax = 8;
       const y = d3.scaleLinear().domain([0, yMax]).range([innerH, 0]);
 
-      const yTicks = [2000, 4000, 6000, 8000, 10000, 12000];
+      const yTicks = [2, 4, 6, 8];
 
       // Grid lines
       yTicks.forEach((t) => {
@@ -107,7 +116,7 @@
           .attr("y", y(t))
           .attr("dy", "0.35em")
           .attr("text-anchor", "end")
-          .text(formatPesos(t));
+          .text(formatUSD(t));
       });
 
       // Y axis title
@@ -117,7 +126,7 @@
         .attr("x", -innerH / 2)
         .attr("y", -margin.left + 16)
         .attr("text-anchor", "middle")
-        .text("Hourly income (ARS)");
+        .text("Hourly income (USD)");
 
       // Bars
       const groups = g
@@ -132,7 +141,11 @@
         .data((d) =>
           sexos.map((s) => {
             const item = data.find((r) => r.educacion === d && r.sexo === s);
-            return { sexo: s, value: item.ingreso_por_hora, educacion: d };
+            return {
+              sexo: s,
+              value: item.ingreso_por_hora / 1450,
+              educacion: d,
+            };
           }),
         )
         .join("path")
@@ -161,7 +174,7 @@
         .data((d) =>
           sexos.map((s) => {
             const item = data.find((r) => r.educacion === d && r.sexo === s);
-            return { sexo: s, value: item.ingreso_por_hora };
+            return { sexo: s, value: item.ingreso_por_hora / 1450 };
           }),
         )
         .join("text")
@@ -169,14 +182,14 @@
         .attr("x", (d) => x1(d.sexo) + x1.bandwidth() / 2)
         .attr("y", (d) => y(d.value) - 8)
         .attr("text-anchor", "middle")
-        .text((d) => formatPesos(d.value));
+        .text((d) => formatUSDLabel(d.value));
 
       // X axis labels (multiline)
       const labelMap = {
         "Primario incompleto": ["Primary", "incomplete"],
         "Secundario incompleto": ["Secondary", "incomplete"],
         "Secundario completo": ["Secondary", "complete"],
-        "Universitario en curso/completo": ["University", "in progress"],
+        "Universitario en curso/completo": ["University", "in progress+"],
       };
 
       educacion.forEach((ed) => {

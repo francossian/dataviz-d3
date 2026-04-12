@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="chart-styles.css" />
+    <style>
+      .title {
+        font-size: 36px;
+      }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
     <script src="datos_brecha_3T25.js"></script>
   </head>
@@ -11,12 +16,12 @@
     <div class="container">
       <div class="header">
         <div class="title">
-          <span class="hl-hombres">Men</span> work more paid
-          hours<sup>1</sup> than
+          <span class="hl-hombres">Men</span> work more paid hours<sup>1</sup>
+          than
           <span class="hl-mujeres">women</span>
         </div>
         <div class="subtitle">
-          Paid hours worked per week, by education level and sex
+          Average hours worked per week, by education level and sex
         </div>
       </div>
       <div class="legend">
@@ -32,8 +37,7 @@
       <div class="chart-area" id="chart"></div>
       <div class="footnote">
         <sup>1</sup>Women work more unpaid hours than men (household tasks,
-        caregiving, etc.) but this chart only considers paid hours in the main
-        job.
+        caregiving, etc.). This chart only considers paid hours in the main job.
       </div>
       <div class="caption">
         Source: EPH, INDEC · Q3 2025 · Occupied adults, main job<br />Prepared

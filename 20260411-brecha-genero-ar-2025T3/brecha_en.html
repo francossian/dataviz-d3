@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="chart-styles.css" />
+    <style>.title { font-size: 36px; }</style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
     <script src="datos_brecha_3T25.js"></script>
   </head>
@@ -11,7 +12,8 @@
     <div class="container">
       <div class="header">
         <div class="title">
-          Women earn <span class="hl-brecha">X%</span> less than men
+          In Argentina, women earn <span class="hl-brecha">X%</span> less than
+          men
         </div>
         <div class="subtitle">
           Gender pay gap in hourly income, by education level
@@ -150,7 +152,7 @@
         "Primario incompleto": ["Primary", "incomplete"],
         "Secundario incompleto": ["Secondary", "incomplete"],
         "Secundario completo": ["Secondary", "complete"],
-        "Universitario en curso/completo": ["University", "in progress"],
+        "Universitario en curso/completo": ["University", "in progress+"],
       };
 
       educacion.forEach((ed) => {
